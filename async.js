@@ -26,7 +26,7 @@ console.log("2. 同期的な処理を実行します");
 try {
     setTimeout(
         () => {
-            throw new Error("非同期なエラー");
+            // throw new Error("非同期なエラー");
         }, 10);
 } catch (error) {
     console.log("非同期エラーはキャッチできないため、この行は実行されない")
@@ -71,5 +71,70 @@ dummyFetch("/success/data", (error, response) => {
         console.log(response)
     }
 });
+
+// =======================================================
+
+// =======================================================
+// `Promise`インスタンスを作成
+var promise = new Promise((resolve, reject) => {
+    // 非同期の処理が成功したときはresolve()を呼ぶ
+    // 非同期の処理が失敗したときにはreject()を呼ぶ
+});
+var onFulfilled = () => {
+    console.log("resolveされたときに呼ばれる");
+};
+var onRejected = () => {
+    console.log("rejectされたときに呼ばれる");
+};
+// `then`メソッドで成功時と失敗時に呼ばれるコールバック関数を登録
+promise.then(onFulfilled, onRejected);
+
+// =======================================================
+
+// =======================================================
+// promise
+// 非同期処理はコールバック関数を受け取るのではなく、Promiseインスタンを返す
+function dummyFetch(path) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+                if (path.startsWith("/success")) {
+                    resolve({ body: `Response body of ${path}`});
+                } else {
+                    reject(new Error("NOT FOUND"))
+                }
+        }, 1000 * Math.random());
+    });
+}
+
+dummyFetch("/success/data").then(
+    function onFulfilled(response) {
+        console.log(response);
+    },
+    function onRejected(error){
+        // この行は実行されない
+    }
+);
+// =======================================================
+
+// =======================================================
+// primiseの状態
+//  - fullfilled
+//  - rejected -> 成功時メソッドが呼ばれる
+//  - pending -> 失敗時メソッドが呼ばれる
+//  - setteld
+// -> これらの状態は一度しか変化しない
+// -> 一度だけ呼ばれるコールバック関数を登録するのが`then`や`catch`メソッドとなる
+
+
+// =======================================================
+// fullfilledなPromiseインスタンスを生成
+// Promise.resolveメソッドはnew Promiseの糖衣構文
+var promise = Promise.resolve();
+
+// 成功時のコールバック関数を登録
+promise.then(() => {
+    console.log("2. コールバック関数が実行されました")
+});
+console.log("1. 同期的な処理が実行されました")
 
 // =======================================================
