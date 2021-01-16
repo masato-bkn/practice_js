@@ -1,12 +1,17 @@
 function main() {
-    fetcheUserInfo("js-primer-example");
+    fetcheUserInfo("js-primer-example")
+        .catch((error) => {
+            // Promiseチェーンで発生したエラーを受け取る
+            console.error(`エラーが発生しました(${error})`);
+        });
 }
 
 function fetchUserInfo(userId) {
     fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
         .then(response => {
             if (!response.ok) {
-                console.error("エラーレスポンス", response);
+                // ここをmainでエラーハンドリングしたい
+                return Promise.reject(new Error(`${response.status}: ${response.statusText}`))
             } else {
                 return response.json().then(userInfo => {
                     const view = createView(userInfo);
