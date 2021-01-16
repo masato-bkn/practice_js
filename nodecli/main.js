@@ -1,12 +1,12 @@
 const program = require("commander");
 const fs = require("fs");
-const marked = require("marked");
+// md2htmlモジュールをインポートする
+const md2html = require("./md2html");
 
 program.option("--gfm", "GFMを有効にする");
 program.parse(process.argv);
 const filePath = program.args[0];
 
-// コマンドライン引数のオプションを取得し、デフォルトのオプションを上書きする
 const cliOptions = {
     gfm: false,
     ...program.opts(),
@@ -14,13 +14,11 @@ const cliOptions = {
 
 fs.readFile(filePath, { encoding: "utf8" }, (err, file) => {
     if (err) {
-        console.error(err.message);
+        console.error(err);
         process.exit(1);
         return;
     }
-    // gfmオプションを無効にする
-    const html = marked(file, {
-        gfm: false
-    });
+    // md2htmlモジュールを使ってHTMLに変換する
+    const html = md2html(file, cliOptions);
     console.log(html);
 });
