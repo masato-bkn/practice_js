@@ -1,25 +1,23 @@
 function main() {
     fetcheUserInfo("js-primer-example")
+        .then((userInfo) => createView(userInfo))
+        .then((view) => displayView(view))
         .catch((error) => {
             // Promiseチェーンで発生したエラーを受け取る
             console.error(`エラーが発生しました(${error})`);
         });
 }
+// thenはPromiseインスタンスを返さないメソッドに対しても使えるらしい
 
 function fetchUserInfo(userId) {
-    fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
+    return fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
         .then(response => {
             if (!response.ok) {
-                // ここをmainでエラーハンドリングしたい
-                return Promise.reject(new Error(`${response.status}: ${response.statusText}`))
+                return Promise.reject(new Error(`${response.status}: ${response.statusText}`));
             } else {
-                return response.json().then(userInfo => {
-                    const view = createView(userInfo);
-                    display(view);
-                });
+                // JSONオブジェクトで解決されるPromiseを返す
+                return response.json();
             }
-        }).catch(error => {
-            console.error(error);
         });
 }
 
