@@ -1,13 +1,12 @@
-function main() {
-    fetcheUserInfo("js-primer-example")
-        .then((userInfo) => createView(userInfo))
-        .then((view) => displayView(view))
-        .catch((error) => {
-            // Promiseチェーンで発生したエラーを受け取る
-            console.error(`エラーが発生しました(${error})`);
-        });
+async function main() {
+    try {
+        const userInfo = await fetchUserInfo("js-primer-example");
+        const view = createView(userInfo);
+        displayView(view);
+    } catch (error) {
+        console.error(`エラーが発生しました(${error})`);
+    }
 }
-// thenはPromiseインスタンスを返さないメソッドに対しても使えるらしい
 
 function fetchUserInfo(userId) {
     return fetch(`https://api.github.com/users/${encodeURIComponent(userId)}`)
@@ -19,6 +18,26 @@ function fetchUserInfo(userId) {
                 return response.json();
             }
         });
+}
+
+function escapeSpecialChars(str) {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function escapeHTML(strings, ...values) {
+    return strings.reduce((result, str, i) => {
+        const value = values[i - 1];
+        if (typeof value === "string") {
+            return result + escapeSpecialChars(value) + str;
+        } else {
+            return result + String(value) + str;
+        }
+    });
 }
 
 function createView(userInfo) {
